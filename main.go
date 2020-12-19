@@ -18,54 +18,6 @@ type Options struct {
 	Highlight             bool `long:"highlight" description:"Highlight matches in output" long-description:"If capturing groups are provided, each group will be highlighted individually. If no capture groups are provided, the entire first match will be highlighted."`
 }
 
-func highlight(re *regexp.Regexp, in []byte, highlightMatch *color.Color, highlightGroup *color.Color, dimWith *color.Color) string {
-	if re.String() == "" {
-		return fmt.Sprintf("%s", in)
-	}
-	matches := re.FindAllSubmatchIndex(in, -1)
-	// check if the entire string is matched
-	// if len(matches) == 1 && len(matches[0]) == 1 && matches[0][0] == 0 && matches[0][1] == len(matches)-1 {
-	// 	return fmt.Sprintf("%s", in)
-	// }
-	out := dimWith.Sprintf("%s", in[:matches[0][0]])
-	for i, match := range matches {
-		matchStr := ""
-		if len(match) == 2 {
-			// no groups
-			matchStr += fmt.Sprintf("%s", in[match[0]:match[1]])
-		} else {
-			// add ungrouped prefix
-			matchStr += fmt.Sprintf("%s", in[match[0]:match[2]])
-		}
-		for j := 2; j < len(match); j += 2 {
-			groupStartIndex := match[j]
-			groupEndIndex := match[j+1]
-			// highlight this group
-			matchStr += highlightGroup.Sprintf("%s", in[groupStartIndex:groupEndIndex])
-			// add text between this and next group
-			if j == len(match)-2 {
-				// add end of last group to end of match
-				matchStr += fmt.Sprintf("%s", in[groupEndIndex:match[1]])
-			} else {
-				// add end of last group to start of next one
-				matchStr += fmt.Sprintf("%s", in[groupEndIndex:match[j+2]])
-			}
-		}
-		// highlight this match
-		out += highlightMatch.Sprint(matchStr)
-		// add text between this and next match
-		if i == len(matches)-1 {
-			// dim end of last match to end of string
-			out += dimWith.Sprintf("%s", in[match[1]:])
-		} else {
-			// dim end of last match to start of next one
-			nextMatch := matches[i+1]
-			out += dimWith.Sprintf("%s", in[match[1]:nextMatch[0]])
-		}
-	}
-	return out
-}
-
 func main() {
 	var options Options
 	_, err := flags.Parse(&options)
@@ -96,12 +48,14 @@ func main() {
 
 	go func() {
 		for {
-			b := make([]byte, 1)
-			_, err := tty.Read(b)
+			bs := make([]byte, 3)
+			n, err := tty.Read(bs)
 			if err != nil {
 				panic(err)
 			}
-			ttyBytes <- b[0]
+			for i := 0; i < n; i++ {
+				ttyBytes <- bs[i]
+			}
 		}
 	}()
 
@@ -116,11 +70,7 @@ func main() {
 	}()
 
 	wipeLine := func() {
-		w, _, err := term.GetSize(ttyFd)
-		if err != nil {
-			panic(err)
-		}
-		fmt.Printf("\r%"+fmt.Sprint(w)+"s\r", "")
+		fmt.Print("\r\033[K")
 	}
 
 	faint := color.New(color.Faint)
@@ -132,13 +82,14 @@ func main() {
 		RegexpCompile = regexp.CompilePOSIX
 	}
 
-	currentPattern := []byte{}
 	currentRegex, err := RegexpCompile("")
 	if err != nil {
 		// I'm not using MustCompile here to deduplicate the posix logic
 		panic(err)
 	}
 	skippedLines := 0
+
+	lineEditor := LineEditor{}
 
 	for {
 		select {
@@ -165,34 +116,23 @@ func main() {
 				skippedLines++
 			}
 		case b := <-ttyBytes:
-			switch b {
-			case 3: // ctl+c
+			if done := lineEditor.Consume(b); done {
 				fmt.Printf("\r\nexiting\r\n")
 				return
-			case 4: // ctl+d
-				if len(currentPattern) == 0 {
-					fmt.Printf("\r\nexiting\r\n")
-					return
-				}
-				currentPattern = []byte{}
-				currentRegex = regexp.MustCompile("")
-			case 127: // backspace
-				if len(currentPattern) > 0 {
-					currentPattern = currentPattern[:len(currentPattern)-1]
-				}
-			default:
-				currentPattern = append(currentPattern, b)
 			}
-			re, err := RegexpCompile(string(currentPattern))
+			re, err := RegexpCompile(lineEditor.GetText())
 			if err == nil {
 				currentRegex = re
 			}
 			wipeLine()
 		}
+		var prefix string
 		if skippedLines == 0 {
-			fmt.Printf("\r%s %s", faint.Sprint("regex:"), currentPattern)
+			prefix = faint.Sprint("regex: ")
 		} else {
-			fmt.Printf("\r%d %s %s", skippedLines, faint.Sprint("regex:"), currentPattern)
+			prefix = fmt.Sprintf("%d %s ", skippedLines, faint.Sprint("regex:"))
 		}
+		fmt.Fprint(os.Stdout, "\r") // move cursor to start
+		lineEditor.Display(os.Stdout, prefix)
 	}
 }
