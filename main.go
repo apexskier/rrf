@@ -31,7 +31,11 @@ func highlight(re *regexp.Regexp, in []byte, highlightMatch *color.Color, highli
 	for i, match := range matches {
 		matchStr := ""
 		if len(match) == 2 {
-			matchStr = fmt.Sprintf("%s", in[match[0]:match[1]])
+			// no groups
+			matchStr += fmt.Sprintf("%s", in[match[0]:match[1]])
+		} else {
+			// add ungrouped prefix
+			matchStr += fmt.Sprintf("%s", in[match[0]:match[2]])
 		}
 		for j := 2; j < len(match); j += 2 {
 			groupStartIndex := match[j]

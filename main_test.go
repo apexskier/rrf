@@ -82,3 +82,17 @@ func TestHighlightMultipleMatchesAndGroups(t *testing.T) {
 		t.Errorf("unexpected output: %s", line)
 	}
 }
+
+func TestHighlightPrefixUnGrouped(t *testing.T) {
+	dateRE := regexp.MustCompile("da(te)")
+	line := highlight(
+		dateRE,
+		[]byte(`a date is 2015-05-27, a date`),
+		color.New(),
+		color.New(),
+		color.New(),
+	)
+	if string(line) != "a date is 2015-05-27, a date" {
+		t.Errorf("unexpected output: %s", line)
+	}
+}
