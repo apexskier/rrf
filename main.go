@@ -74,7 +74,7 @@ func main() {
 	}
 
 	faint := color.New(color.Faint)
-	matchHighlight := color.New(color.Bold)
+	matchHighlight := color.New()
 	groupHighlight := color.New(color.Underline)
 
 	RegexpCompile := regexp.Compile

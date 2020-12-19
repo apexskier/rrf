@@ -55,10 +55,13 @@ func (le *LineEditor) Consume(b byte) bool {
 	case 3: // ctl+c
 		return true
 	case 4: // ctl+d
+		// treat as ctl+c if no content
 		if len(le.textBytes) == 0 {
 			return true
 		}
+		// otherwise clear input
 		le.textBytes = []byte{}
+		le.cursorPos = 0
 	case 127: // backspace
 		if le.cursorPos > 0 {
 			le.textBytes = append(le.textBytes[:le.cursorPos-1], le.textBytes[le.cursorPos:]...)

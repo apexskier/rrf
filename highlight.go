@@ -18,30 +18,27 @@ func highlight(re *regexp.Regexp, in []byte, highlightMatch *color.Color, highli
 	// }
 	out := dimWith.Sprintf("%s", in[:matches[0][0]])
 	for i, match := range matches {
-		matchStr := ""
 		if len(match) == 2 {
 			// no groups
-			matchStr += fmt.Sprintf("%s", in[match[0]:match[1]])
+			out += highlightMatch.Sprintf("%s", in[match[0]:match[1]])
 		} else {
 			// add ungrouped prefix
-			matchStr += fmt.Sprintf("%s", in[match[0]:match[2]])
+			out += highlightMatch.Sprintf("%s", in[match[0]:match[2]])
 		}
 		for j := 2; j < len(match); j += 2 {
 			groupStartIndex := match[j]
 			groupEndIndex := match[j+1]
 			// highlight this group
-			matchStr += highlightGroup.Sprintf("%s", in[groupStartIndex:groupEndIndex])
+			out += highlightGroup.Sprintf("%s", in[groupStartIndex:groupEndIndex])
 			// add text between this and next group
 			if j == len(match)-2 {
 				// add end of last group to end of match
-				matchStr += fmt.Sprintf("%s", in[groupEndIndex:match[1]])
+				out += highlightMatch.Sprintf("%s", in[groupEndIndex:match[1]])
 			} else {
 				// add end of last group to start of next one
-				matchStr += fmt.Sprintf("%s", in[groupEndIndex:match[j+2]])
+				out += highlightMatch.Sprintf("%s", in[groupEndIndex:match[j+2]])
 			}
 		}
-		// highlight this match
-		out += highlightMatch.Sprint(matchStr)
 		// add text between this and next match
 		if i == len(matches)-1 {
 			// dim end of last match to end of string
