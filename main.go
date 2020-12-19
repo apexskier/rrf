@@ -126,13 +126,15 @@ func main() {
 			}
 			wipeLine()
 		}
-		var prefix string
-		if skippedLines == 0 {
-			prefix = faint.Sprint("regex: ")
-		} else {
-			prefix = fmt.Sprintf("%d %s ", skippedLines, faint.Sprint("regex:"))
-		}
 		fmt.Fprint(os.Stdout, "\r") // move cursor to start
-		lineEditor.Display(os.Stdout, prefix)
+		suffix := ""
+		if options.ShowFilteredLineCount && skippedLines > 0 {
+			plural := "s"
+			if skippedLines == 1 {
+				plural = ""
+			}
+			suffix = fmt.Sprintf(" (%d line%s filtered since last)", skippedLines, plural)
+		}
+		lineEditor.Display(os.Stdout, "regex: ", suffix, faint)
 	}
 }

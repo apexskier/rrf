@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"io"
+
+	"github.com/fatih/color"
 )
 
 // LineEditor manages a "text entry" field that can be re-written to different
@@ -22,10 +24,8 @@ func (le *LineEditor) GetText() string {
 
 // Display writes the current text with an appropriate cursor position to the
 // given writer.
-func (le *LineEditor) Display(to io.Writer, prefix string) {
-	fmt.Fprint(to, prefix, string(le.textBytes))
-	suffix := fmt.Sprintf(" (cursor: %d, len: %d)", le.cursorPos, len(le.textBytes))
-	fmt.Fprint(to, suffix)
+func (le *LineEditor) Display(to io.Writer, prefix, suffix string, fixColor *color.Color) {
+	fmt.Fprint(to, fixColor.Sprint(prefix), string(le.textBytes), fixColor.Sprint(suffix))
 	if le.cursorPos < len(le.textBytes)+len(suffix) {
 		fmt.Fprintf(to, "\033[%dD", len(le.textBytes)-le.cursorPos+len(suffix))
 	}
