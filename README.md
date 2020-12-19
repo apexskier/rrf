@@ -13,12 +13,12 @@ Usage:
   rrf [OPTIONS]
 
 Application Options:
-      --posix             Use POSIX ERE (egrep) syntax
-      --filtered-count    Show count of filtered lines between output
-      --highlight-groups  Highlight match groups in output
+      --posix           Use POSIX ERE (egrep) syntax
+      --filtered-count  Show count of filtered lines between output
+      --highlight       Highlight matches in output
 
 Help Options:
-  -h, --help              Show this help message
+  -h, --help            Show this help message
 ```
 
 ## Future plans
