@@ -14,10 +14,16 @@ rrf --help
 Usage:
   rrf [OPTIONS]
 
+  rrf will read from stdin. Usually you'll want to do something like
+  `tail -f my.log | rrf`
+
+  Once running, type a regex. Once a valid regex is entered, the output filter
+  will be updated.
+
 Application Options:
       --posix           Use POSIX ERE (egrep) syntax
       --filtered-count  Show count of filtered lines between output
-      --highlight       Highlight matches in output
+      --no-highlight    Do not highlight matches in output
 
 Help Options:
   -h, --help            Show this help message
