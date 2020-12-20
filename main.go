@@ -21,8 +21,25 @@ type Options struct {
 
 func main() {
 	var options Options
-	_, err := flags.Parse(&options)
+	flagsParser := flags.NewParser(&options, flags.Default)
+	flagsParser.Usage += `[OPTIONS]
+
+  rrf will read from stdin. Usually you'll want to do something like
+  ` + "`" + `tail -f my.log | rrf` + "`" + `
+
+  Once running, type a regex. Once a valid regex is entered, the output filter
+  will be updated.`
+	_, err := flagsParser.Parse()
 	if err != nil {
+		os.Exit(1)
+	}
+
+	stat, err := os.Stdin.Stat()
+	if err != nil {
+		panic(err)
+	}
+	if (stat.Mode() & os.ModeCharDevice) != 0 {
+		flagsParser.WriteHelp(os.Stdout)
 		os.Exit(1)
 	}
 
