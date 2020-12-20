@@ -31,14 +31,14 @@ jobs:
           VERSION: ${{ steps.version.outputs.VERSION }}
           GOOS: darwin
           GOARCH: amd64
-        run: go build -o ./rrf.$GOOS-$GOARCH -ldflags "-X main.GitCommit=$GITHUB_REF -X main.Version=$VERSION" ./...
+        run: go build -o ./rrf.$GOOS-$GOARCH -ldflags "-X main.GitCommit=$GITHUB_SHA -X main.Version=$VERSION" ./...
 
       - name: Build linux 386
         env:
           VERSION: ${{ steps.version.outputs.VERSION }}
           GOOS: linux
           GOARCH: 386
-        run: go build -o ./rrf.$GOOS-$GOARCH -ldflags "-X main.GitCommit=$GITHUB_REF -X main.Version=$VERSION" ./...
+        run: go build -o ./rrf.$GOOS-$GOARCH -ldflags "-X main.GitCommit=$GITHUB_SHA -X main.Version=$VERSION" ./...
 
       - name: Release
         id: release
