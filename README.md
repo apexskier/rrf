@@ -5,7 +5,7 @@
 It's a small utility for realtime filtering of text streams in your terminal
 using regular expressions.
 
-![Demo](https://content.camlittle.com/rrf-demo.mp4)
+![Demo](https://content.camlittle.com/rrf-demo.mov)
 
 ## Usage
 
