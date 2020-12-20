@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"io"
 
@@ -31,9 +32,16 @@ func (le *LineEditor) Display(to io.Writer, prefix, suffix string, fixColor *col
 	}
 }
 
+var (
+	// ErrCtlC is returned when the user typed ctl-c, the program should handle SIGINT
+	ErrCtlC = errors.New("ctl-c")
+	// ErrCtlD is returned when the user typed ctl-d, the program should handle EOF
+	ErrCtlD = errors.New("ctl-d")
+)
+
 // Consume takes in a byte of date from keyboard entry, and returns true if it's
 // the last one expected to be consumed
-func (le *LineEditor) Consume(b byte) bool {
+func (le *LineEditor) Consume(b byte) error {
 	if len(le.processing) == 2 {
 		// we're in a control sequence
 		switch b {
@@ -49,15 +57,14 @@ func (le *LineEditor) Consume(b byte) bool {
 			}
 		}
 		le.processing = []byte{}
-		return false
+		return nil
 	}
 	switch b {
 	case 3: // ctl+c
-		return true
+		return ErrCtlC
 	case 4: // ctl+d
-		// treat as ctl+c if no content
 		if len(le.textBytes) == 0 {
-			return true
+			return ErrCtlD
 		}
 		// otherwise clear input
 		le.textBytes = []byte{}
@@ -72,7 +79,7 @@ func (le *LineEditor) Consume(b byte) bool {
 	case 91: // [
 		if len(le.processing) == 1 {
 			le.processing = append(le.processing, b)
-			return false
+			return nil
 		}
 		fallthrough
 	default:
@@ -84,5 +91,5 @@ func (le *LineEditor) Consume(b byte) bool {
 		le.textBytes[le.cursorPos] = b
 		le.cursorPos++
 	}
-	return false
+	return nil
 }
