@@ -5,7 +5,7 @@
 It's a small utility for realtime filtering of text streams in your terminal
 using regular expressions.
 
-[![asciicast](https://asciinema.org/a/Psv7iVedvswxtGMo4AE8F2AkH.svg)](https://asciinema.org/a/Psv7iVedvswxtGMo4AE8F2AkH)
+![Demo](./rrf-demo.mov)
 
 ## Usage
 
