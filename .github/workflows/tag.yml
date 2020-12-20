@@ -33,7 +33,7 @@ jobs:
           GOARCH: amd64
         run: go build -v -o rrf.$GOOS-GOARCH "-X main.GitCommit=$GITHUB_REF -X main.Version=$VERSION" ./...
 
-      - name: Build macOS amd64
+      - name: Build linux 386
         env:
           VERSION: ${{ steps.version.outputs.VERSION }}
           GOOS: linux
