@@ -61,8 +61,12 @@ func main() {
 	}()
 
 	go func() {
-		// on return, this appears to wait until the next line is read before ending,
-		// which causes the program to hang until then
+		// Scanner.Scan blocks until the next input. Since Stdin may take a time to
+		// produce data, it'll hang
+		// Some threads
+		// - https://www.reddit.com/r/golang/comments/fsxkqr/cancelling_blocking_read_from_stdin/
+		// - https://github.com/golang/go/issues/7990
+		// - https://stackoverflow.com/questions/60960288/stopping-a-bufio-scanner-with-a-stop-channel
 		scannerIn := bufio.NewScanner(os.Stdin)
 		for scannerIn.Scan() {
 			inLines <- scannerIn.Bytes()
