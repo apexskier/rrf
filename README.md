@@ -25,9 +25,7 @@ Help Options:
 
 ## Future plans
 
-- Automatic building/publishing
 - Highlighting customization?
-- Versioning
 - Find something that will give me readline in the input prompt?
    Nothing I've found so far allows stateful reuse. They all block until a line
    is read, and I want to be able to keep streaming stdin while editing.
