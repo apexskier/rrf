@@ -5,7 +5,11 @@
 It's a small utility for realtime filtering of text streams in your terminal
 using regular expressions.
 
+### mp4 demo
 ![Demo](./rrf-demo.mp4)
+
+### mov demo
+![Demo](./rrf-demo.mov)
 
 ## Usage
 
