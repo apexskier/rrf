@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"os"
 	"regexp"
@@ -116,9 +117,12 @@ func main() {
 				skippedLines++
 			}
 		case b := <-ttyBytes:
-			if done := lineEditor.Consume(b); done {
-				fmt.Printf("\r\nexiting\r\n")
-				return
+			if err := lineEditor.Consume(b); err != nil {
+				if errors.Is(err, ErrCtlC) || errors.Is(err, ErrCtlD) {
+					fmt.Printf("\r\nexiting\r\n")
+					return
+				}
+				panic(err)
 			}
 			re, err := RegexpCompile(lineEditor.GetText())
 			if err == nil {
