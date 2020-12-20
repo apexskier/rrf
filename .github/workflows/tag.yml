@@ -47,7 +47,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_GH_TOKEN }}
         with:
-          draft: true
           tag_name: ${{ steps.version.outputs.VERSION }}
           release_name: ${{ steps.version.outputs.VERSION }}
           prerelease: ${{ !!steps.semver.outputs.prerelease }}
