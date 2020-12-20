@@ -14,13 +14,20 @@ import (
 
 // Options describes the command line options this program supports
 type Options struct {
-	Posix                 bool `long:"posix" description:"Use POSIX ERE (egrep) syntax"`
-	ShowFilteredLineCount bool `long:"filtered-count" description:"Show count of filtered lines between output"`
-	NoHighlight           bool `long:"no-highlight" description:"Do not highlight matches in output" long-description:"If capturing groups are provided, each group will be highlighted individually. If no capture groups are provided, the entire first match will be highlighted."`
+	Posix                 bool   `long:"posix" description:"Use POSIX ERE (egrep) syntax"`
+	ShowFilteredLineCount bool   `long:"filtered-count" description:"Show count of filtered lines between output"`
+	NoHighlight           bool   `long:"no-highlight" description:"Do not highlight matches in output" long-description:"If capturing groups are provided, each group will be highlighted individually. If no capture groups are provided, the entire first match will be highlighted."`
+	Version               func() `long:"version" short:"v" description:"Print version information"`
 }
 
 func main() {
 	var options Options
+
+	options.Version = func() {
+		fmt.Printf("%s (%s)\n", Version, GitCommit)
+		os.Exit(0)
+	}
+
 	flagsParser := flags.NewParser(&options, flags.Default)
 	flagsParser.Usage += `[OPTIONS]
 
