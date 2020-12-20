@@ -16,7 +16,7 @@ import (
 type Options struct {
 	Posix                 bool `long:"posix" description:"Use POSIX ERE (egrep) syntax"`
 	ShowFilteredLineCount bool `long:"filtered-count" description:"Show count of filtered lines between output"`
-	Highlight             bool `long:"highlight" description:"Highlight matches in output" long-description:"If capturing groups are provided, each group will be highlighted individually. If no capture groups are provided, the entire first match will be highlighted."`
+	NoHighlight           bool `long:"no-highlight" description:"Do not highlight matches in output" long-description:"If capturing groups are provided, each group will be highlighted individually. If no capture groups are provided, the entire first match will be highlighted."`
 }
 
 func main() {
@@ -107,10 +107,10 @@ func main() {
 					}
 					fmt.Printf("%s\r\n", faint.Sprintf("%d line%s filtered", skippedLines, plural))
 				}
-				if options.Highlight {
-					fmt.Printf("%s\r\n", highlight(currentRegex, line, matchHighlight, groupHighlight, faint))
-				} else {
+				if options.NoHighlight {
 					fmt.Printf("%s\r\n", line)
+				} else {
+					fmt.Printf("%s\r\n", highlight(currentRegex, line, matchHighlight, groupHighlight, faint))
 				}
 				skippedLines = 0
 			} else {
