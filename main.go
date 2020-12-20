@@ -26,7 +26,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	inDone := make(chan bool, 1)
+	stop := make(chan error, 1)
 	inLines := make(chan []byte)
 	ttyBytes := make(chan byte)
 
@@ -71,7 +71,7 @@ func main() {
 		for scannerIn.Scan() {
 			inLines <- scannerIn.Bytes()
 		}
-		inDone <- true
+		stop <- scannerIn.Err()
 	}()
 
 	wipeLine := func() {
@@ -98,8 +98,11 @@ func main() {
 
 	for {
 		select {
-		case <-inDone:
+		case err := <-stop:
 			wipeLine()
+			if err != nil {
+				panic(err)
+			}
 			return
 		case line := <-inLines:
 			wipeLine()
