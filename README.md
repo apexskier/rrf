@@ -26,7 +26,6 @@ Help Options:
 ## Future plans
 
 - Automatic building/publishing
-- More comprehensive tests
 - Highlighting customization?
 - Versioning
 - Find something that will give me readline in the input prompt?
